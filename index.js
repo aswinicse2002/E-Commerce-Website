@@ -1,39 +1,36 @@
 /**
  *
- * UserList
+ * UserRole
  *
  */
 
 import React from 'react';
 
-import { formatDate } from '../../../utils/date';
-import UserRole from '../UserRole';
+import { ROLES } from '../../../constants';
+import Badge from '../../Common/Badge';
 
-const UserList = props => {
-  const { users } = props;
+const UserRole = props => {
+  const { className, user } = props;
 
   return (
-    <div className='u-list'>
-      {users.map((user, index) => (
-        <div key={index} className='mt-3 px-4 py-3 user-box'>
-          <label className='text-black'>Name</label>
-          <p className='fw-medium'>
-            {user?.firstName ? `${user?.firstName} ${user?.lastName}` : 'N/A'}
-          </p>
-          <label className='text-black'>Email</label>
-          <p>{user?.email ?? '-'}</p>
-          <label className='text-black'>Provider</label>
-          <p>{user?.provider}</p>
-          <label className='text-black'>Account Created</label>
-          <p>{formatDate(user?.created)}</p>
-          <label className='text-black'>Role</label>
-          <p className='mb-0'>
-            <UserRole user={user} className='d-inline-block mt-2' />
-          </p>
-        </div>
-      ))}
-    </div>
+    <>
+      {user.role === ROLES.Admin ? (
+        <Badge variant='primary' className={className}>
+          Admin
+        </Badge>
+      ) : user.role === ROLES.Merchant ? (
+        <Badge variant='dark' className={className}>
+          Merchant
+        </Badge>
+      ) : (
+        <Badge className={className}>Member</Badge>
+      )}
+    </>
   );
 };
 
-export default UserList;
+UserRole.defaultProps = {
+  className: ''
+};
+
+export default UserRole;
