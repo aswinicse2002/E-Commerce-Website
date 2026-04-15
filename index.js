@@ -1,189 +1,188 @@
 /**
  *
- * EditProduct
+ * MerchantList
  *
  */
 
 import React from 'react';
 
-import { Link } from 'react-router-dom';
-import { Row, Col } from 'reactstrap';
-
-import { ROLES } from '../../../constants';
-import Input from '../../Common/Input';
-import Switch from '../../Common/Switch';
+import { MERCHANT_STATUS } from '../../../constants';
+import { formatDate } from '../../../utils/date';
 import Button from '../../Common/Button';
-import SelectOption from '../../Common/SelectOption';
+import { CheckIcon, XIcon, RefreshIcon, TrashIcon } from '../../Common/Icon';
 
-const taxableSelect = [
-  { value: 1, label: 'Yes' },
-  { value: 0, label: 'No' }
-];
-
-const EditProduct = props => {
+const MerchantList = props => {
   const {
-    user,
-    product,
-    productChange,
-    formErrors,
-    brands,
-    updateProduct,
-    deleteProduct,
-    activateProduct
+    merchants,
+    approveMerchant,
+    rejectMerchant,
+    deleteMerchant,
+    disableMerchant
   } = props;
 
-  const handleSubmit = event => {
-    event.preventDefault();
-    updateProduct();
-  };
+  const renderMerchantPopover = merchant => (
+    <div className='p-2'>
+      <p className='text-gray text-14'>
+        {merchant.isActive
+          ? "Disabling merchant account will disable merchant's brand and account access."
+          : 'Enabling merchant account will restore merchant account access.'}
+      </p>
+      <Button
+        variant='dark'
+        size='sm'
+        className='w-100'
+        text={merchant.isActive ? 'Disable Merchant' : 'Enable Merchant'}
+        onClick={() => disableMerchant(merchant, !merchant.isActive)}
+      />
+    </div>
+  );
 
   return (
-    <div className='edit-product'>
-      <div className='d-flex flex-row mx-0 mb-3'>
-        <label className='mr-1'>Product link </label>
-        <Link to={`/product/${product.slug}`} className='default-link'>
-          {product.slug}
-        </Link>
-      </div>
+    <div className='merchant-list'>
+      {merchants.map((merchant, index) => (
+        <div key={index} className='merchant-box'>
+          <div className='mb-3 p-4'>
+            <label className='text-black'>Business</label>
+            <p className='fw-medium text-truncate'>{merchant.business}</p>
+            <label className='text-black'>Brand</label>
+            <p className='text-truncate'>{merchant.brandName}</p>
+            <label className='text-black'>Name</label>
+            <p className='text-truncate'>{merchant.name}</p>
+            <label className='text-black'>Email</label>
+            <p className='text-truncate'>
+              {merchant.email ? merchant.email : 'N/A'}
+            </p>
+            <label className='text-black'>Phone Number</label>
+            <p>{merchant.phoneNumber}</p>
+            <label className='text-black'>Request date</label>
+            <p>{formatDate(merchant.created)}</p>
 
-      <form onSubmit={handleSubmit} noValidate>
-        <Row>
-          <Col xs='12'>
-            <Input
-              type={'text'}
-              error={formErrors['name']}
-              label={'Name'}
-              name={'name'}
-              placeholder={'Product Name'}
-              value={product.name}
-              onInputChange={(name, value) => {
-                productChange(name, value);
-              }}
-            />
-          </Col>
-          <Col xs='12'>
-            <Input
-              type={'text'}
-              error={formErrors['sku']}
-              label={'Sku'}
-              name={'sku'}
-              placeholder={'Product Sku'}
-              value={product.sku}
-              onInputChange={(name, value) => {
-                productChange(name, value);
-              }}
-            />
-          </Col>
-          <Col xs='12'>
-            <Input
-              type={'text'}
-              error={formErrors['slug']}
-              label={'Slug'}
-              name={'slug'}
-              placeholder={'Product Slug'}
-              value={product.slug}
-              onInputChange={(name, value) => {
-                productChange(name, value);
-              }}
-            />
-          </Col>
-          <Col xs='12' md='12'>
-            <Input
-              type={'textarea'}
-              error={formErrors['description']}
-              label={'Description'}
-              name={'description'}
-              placeholder={'Product Description'}
-              value={product.description}
-              onInputChange={(name, value) => {
-                productChange(name, value);
-              }}
-            />
-          </Col>
-          <Col xs='12' lg='6'>
-            <Input
-              type={'number'}
-              error={formErrors['quantity']}
-              label={'Quantity'}
-              name={'quantity'}
-              decimals={false}
-              placeholder={'Product Quantity'}
-              value={product.quantity}
-              onInputChange={(name, value) => {
-                productChange(name, value);
-              }}
-            />
-          </Col>
-          <Col xs='12' lg='6'>
-            <Input
-              type={'number'}
-              error={formErrors['price']}
-              label={'Price'}
-              name={'price'}
-              min={1}
-              placeholder={'Product Price'}
-              value={product.price}
-              onInputChange={(name, value) => {
-                productChange(name, value);
-              }}
-            />
-          </Col>
-          <Col xs='12' md='12'>
-            <SelectOption
-              error={formErrors['taxable']}
-              label={'Taxable'}
-              multi={false}
-              name={'taxable'}
-              value={[product.taxable ? taxableSelect[0] : taxableSelect[1]]}
-              options={taxableSelect}
-              handleSelectChange={value => {
-                productChange('taxable', value.value);
-              }}
-            />
-          </Col>
-          {user.role === ROLES.Admin && (
-            <Col xs='12' md='12'>
-              <SelectOption
-                error={formErrors['brand']}
-                label={'Select Brand'}
-                multi={false}
-                value={product.brand}
-                options={brands}
-                handleSelectChange={value => {
-                  productChange('brand', value);
-                }}
-              />
-            </Col>
-          )}
-          <Col xs='12' md='12' className='mt-3 mb-2'>
-            <Switch
-              id={`enable-product-${product._id}`}
-              name={'isActive'}
-              label={'Active?'}
-              checked={product?.isActive}
-              toggleCheckboxChange={value => {
-                productChange('isActive', value);
-                activateProduct(product._id, value);
-              }}
-            />
-          </Col>
-        </Row>
-        <hr />
-        <div className='d-flex flex-column flex-md-row'>
-          <Button
-            type='submit'
-            text='Save'
-            className='mb-3 mb-md-0 mr-0 mr-md-3'
-          />
-          <Button
-            variant='danger'
-            text='Delete'
-            onClick={() => deleteProduct(product._id)}
-          />
+            <hr />
+
+            {merchant.status === MERCHANT_STATUS.Approved ? (
+              <>
+                <div className='d-flex flex-row justify-content-between align-items-center mx-0'>
+                  <div className='d-flex flex-row mx-0'>
+                    <CheckIcon className='text-green' />
+                    <p className='ml-2 mb-0'>Approved</p>
+                  </div>
+
+                  <div className='d-flex flex-row align-items-center mx-0'>
+                    <Button
+                      className='ml-3'
+                      size='lg'
+                      round={20}
+                      icon={<TrashIcon width={20} />}
+                      tooltip={true}
+                      tooltipContent='Delete'
+                      id={`delete-${merchant._id}`}
+                      onClick={() => deleteMerchant(merchant)}
+                    />
+                  </div>
+                </div>
+                <Button
+                  className='w-100 mt-3'
+                  size='sm'
+                  text={
+                    merchant.isActive ? 'Disable Merchant' : 'Enable Merchant'
+                  }
+                  popover={true}
+                  popoverTitle={`Are you sure you want to ${
+                    merchant.isActive ? 'disable' : 'enable'
+                  } ${merchant.name}'s merchant account?`}
+                  popoverContent={renderMerchantPopover(merchant)}
+                />
+              </>
+            ) : merchant.status === MERCHANT_STATUS.Rejected ? (
+              <>
+                <div className='d-flex flex-row justify-content-between align-items-center mx-0'>
+                  <Button
+                    size='lg'
+                    round={20}
+                    icon={<RefreshIcon width={18} className='text-primary' />}
+                    tooltip={true}
+                    tooltipContent='Re-Approve'
+                    id={`re-approve-${merchant._id}`}
+                    onClick={() => approveMerchant(merchant)}
+                  />
+                  <div className='d-flex flex-row align-items-center mx-0'>
+                    <Button
+                      className='ml-3'
+                      size='lg'
+                      round={20}
+                      icon={<TrashIcon width={20} />}
+                      tooltip={true}
+                      tooltipContent='Delete'
+                      id={`delete-${merchant._id}`}
+                      onClick={() => deleteMerchant(merchant)}
+                    />
+                  </div>
+                </div>
+              </>
+            ) : merchant.email ? (
+              <div className='d-flex flex-row justify-content-between align-items-center mx-0'>
+                <div className='d-flex flex-row mx-0'>
+                  <Button
+                    size='lg'
+                    round={20}
+                    icon={<CheckIcon width={18} className='text-green' />}
+                    tooltip={true}
+                    tooltipContent='Approve'
+                    id={`approve-${merchant._id}`}
+                    onClick={() => approveMerchant(merchant)}
+                  />
+                  <Button
+                    className='ml-2'
+                    size='lg'
+                    round={20}
+                    icon={<XIcon width={20} />}
+                    tooltip={true}
+                    tooltipContent='Reject'
+                    id={`reject-${merchant._id}`}
+                    onClick={() => rejectMerchant(merchant)}
+                  />
+                </div>
+                <div className='d-flex flex-row align-items-center mx-0'>
+                  <Button
+                    className='ml-3'
+                    size='lg'
+                    round={20}
+                    icon={<TrashIcon width={20} />}
+                    tooltip={true}
+                    tooltipContent='Delete'
+                    id={`delete-${merchant._id}`}
+                    onClick={() => deleteMerchant(merchant)}
+                  />
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className='text-truncate'>
+                  Merchant doesn't have email. Call at
+                  <a
+                    href={`tel:${merchant.phoneNumber}`}
+                    className='text-primary'
+                  >
+                    {' '}
+                    {merchant.phoneNumber}
+                  </a>
+                </p>
+                <Button
+                  size='lg'
+                  round={20}
+                  icon={<TrashIcon width={20} />}
+                  tooltip={true}
+                  tooltipContent='Delete'
+                  id={`delete-${merchant._id}`}
+                  onClick={() => deleteMerchant(merchant)}
+                />
+              </>
+            )}
+          </div>
         </div>
-      </form>
+      ))}
     </div>
   );
 };
 
-export default EditProduct;
+export default MerchantList;
