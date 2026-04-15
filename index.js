@@ -1,62 +1,113 @@
 /**
  *
- * AccountMenu
+ * AddAddress
  *
  */
 
 import React from 'react';
 
-import { NavLink } from 'react-router-dom';
-import { Collapse, Navbar } from 'reactstrap';
+import { Row, Col } from 'reactstrap';
 
+import Checkbox from '../../Common/Checkbox';
+import Input from '../../Common/Input';
 import Button from '../../Common/Button';
 
-const AccountMenu = props => {
-  const { user, isMenuOpen, links, toggleMenu } = props;
+const AddAddress = props => {
+  const { addressFormData, formErrors, addressChange, addAddress } = props;
 
-  const getAllowedProvider = link => {
-    if (!link.provider) return true;
-
-    const userProvider = user.provider ?? '';
-    if (!userProvider) return true;
-
-    return link.provider.includes(userProvider);
+  const handleSubmit = event => {
+    event.preventDefault();
+    addAddress();
   };
 
   return (
-    <div className='panel-sidebar'>
-      <Button
-        text='Dashboard Menu'
-        className={`${isMenuOpen ? 'menu-panel' : 'menu-panel collapse'}`}
-        ariaExpanded={isMenuOpen ? 'true' : 'false'}
-        // ariaLabel={isMenuOpen ? 'dashboard menu expanded' : 'dashboard menu collapse'}
-        onClick={toggleMenu}
-      />
-      <h3 className='panel-title'>Account</h3>
-      <Navbar color='light' light expand='md'>
-        <Collapse isOpen={isMenuOpen} navbar>
-          <ul className='panel-links'>
-            {links.map((link, index) => {
-              const PREFIX = link.prefix ? link.prefix : '';
-              const isProviderAllowed = getAllowedProvider(link);
-              if (!isProviderAllowed) return;
-              return (
-                <li key={index}>
-                  <NavLink
-                    to={PREFIX + link.to}
-                    activeClassName='active-link'
-                    exact
-                  >
-                    {link.name}
-                  </NavLink>
-                </li>
-              );
-            })}
-          </ul>
-        </Collapse>
-      </Navbar>
+    <div className='add-address'>
+      <form onSubmit={handleSubmit} noValidate>
+        <Row>
+          <Col xs='12' md='12'>
+            <Input
+              type={'text'}
+              error={formErrors['address']}
+              label={'Address'}
+              name={'address'}
+              placeholder={'Address: Street, House No / Apartment No'}
+              value={addressFormData.address}
+              onInputChange={(name, value) => {
+                addressChange(name, value);
+              }}
+            />
+          </Col>
+          <Col xs='12' md='12'>
+            <Input
+              type={'text'}
+              error={formErrors['city']}
+              label={'City'}
+              name={'city'}
+              placeholder={'City'}
+              value={addressFormData.city}
+              onInputChange={(name, value) => {
+                addressChange(name, value);
+              }}
+            />
+          </Col>
+          <Col xs='12' lg='6'>
+            <Input
+              type={'text'}
+              error={formErrors['state']}
+              label={'State'}
+              name={'state'}
+              placeholder={'State'}
+              value={addressFormData.state}
+              onInputChange={(name, value) => {
+                addressChange(name, value);
+              }}
+            />
+          </Col>
+          <Col xs='12' lg='6'>
+            <Input
+              type={'text'}
+              error={formErrors['country']}
+              label={'Country'}
+              name={'country'}
+              placeholder={'Please Enter Your country'}
+              value={addressFormData.country}
+              onInputChange={(name, value) => {
+                addressChange(name, value);
+              }}
+            />
+          </Col>
+          <Col xs='12' lg='6'>
+            <Input
+              type={'text'}
+              error={formErrors['zipCode']}
+              label={'Zipcode'}
+              name={'zipCode'}
+              placeholder={'Please Enter Your Zipcode'}
+              value={addressFormData.zipCode}
+              onInputChange={(name, value) => {
+                addressChange(name, value);
+              }}
+            />
+          </Col>
+          <Col xs='12' md='12'>
+            <Checkbox
+              id={'default'}
+              label={'As the Default'}
+              name={'isDefault'}
+              checked={addressFormData.isDefault}
+              onChange={(name, value) => {
+                addressChange(name, value);
+              }}
+            />
+          </Col>
+        </Row>
+        <hr />
+        <div className='add-address-actions'>
+          <Button type='submit' text='Add Address' />
+        </div>
+      </form>
     </div>
   );
 };
 
-export default AccountMenu;
+export default AddAddress;
