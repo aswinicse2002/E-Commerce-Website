@@ -1,69 +1,42 @@
-const colors = [
-  '#FF6633',
-  '#FFB399',
-  '#FF33FF',
-  '#00B3E6',
-  '#E6B333',
-  '#3366E6',
-  '#999966',
-  '#99FF99',
-  '#B34D4D',
-  '#80B300',
-  '#809900',
-  '#E6B3B3',
-  '#6680B3',
-  '#66991A',
-  '#FF99E6',
-  '#CCFF1A',
-  '#FF1A66',
-  '#E6331A',
-  '#33FFCC',
-  '#66994D',
-  '#B366CC',
-  '#4D8000',
-  '#B33300',
-  '#CC80CC',
-  '#66664D',
-  '#991AFF',
-  '#E666FF',
-  '#4DB3FF',
-  '#1AB399',
-  '#E666B3',
-  '#33991A',
-  '#CC9999',
-  '#B3B31A',
-  '#00E680',
-  '#4D8066',
-  '#809980',
-  '#E6FF80',
-  '#1AFF33',
-  '#999933',
-  '#FF3380',
-  '#CCCC00',
-  '#66E64D',
-  '#4D80CC',
-  '#9900B3',
-  '#E64D66',
-  '#4DB380',
-  '#FF4D4D',
-  '#99E6E6',
-  '#6666FF'
-];
+/*
+ *
+ * Merchant
+ *
+ */
 
-export const getRandomColors = () => {
-  const index = Math.floor(Math.random() * colors.length);
-  return colors[index];
-};
+import React from 'react';
 
-let cache = {};
-export const getMemoizedRandomColors = s => {
-  const color = getRandomColors();
+import { connect } from 'react-redux';
+import { Switch, Route } from 'react-router-dom';
 
-  if (s in cache) {
-    return cache[s];
-  } else {
-    let result = color;
-    cache[s] = result;
-    return result;
+import actions from '../../actions';
+import { ROLES } from '../../constants';
+import List from './List';
+import Add from './Add';
+import Page404 from '../../components/Common/Page404';
+
+class Merchant extends React.PureComponent {
+  render() {
+    const { user } = this.props;
+
+    return (
+      <div className='merchant-dashboard'>
+        <Switch>
+          <Route exact path='/dashboard/merchant' component={List} />
+          {user.role === ROLES.Admin && (
+            <Route exact path='/dashboard/merchant/add' component={Add} />
+          )}
+          <Route path='*' component={Page404} />
+        </Switch>
+      </div>
+    );
   }
+}
+
+const mapStateToProps = state => {
+  return {
+    user: state.account.user
+  };
 };
+
+export default connect(mapStateToProps, actions)(Merchant);
