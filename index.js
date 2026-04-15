@@ -1,40 +1,40 @@
 /**
  *
- * OrderSummary
+ * ProductList
  *
  */
 
 import React from 'react';
 
-import { Col } from 'reactstrap';
+import { Link } from 'react-router-dom';
 
-const OrderSummary = props => {
-  const { order } = props;
+const ProductList = props => {
+  const { products } = props;
 
   return (
-    <Col className='order-summary pt-3'>
-      <h2>Order Summary</h2>
-      <div className='d-flex align-items-center summary-item'>
-        <p className='summary-label'>Subtotal</p>
-        <p className='summary-value ml-auto'>${order.total}</p>
-      </div>
-      <div className='d-flex align-items-center summary-item'>
-        <p className='summary-label'>Est. Sales Tax</p>
-        <p className='summary-value ml-auto'>${order.totalTax}</p>
-      </div>
-
-      <div className='d-flex align-items-center summary-item'>
-        <p className='summary-label'>Shipping & Handling</p>
-        <p className='summary-value ml-auto'>$0</p>
-      </div>
-
-      <hr />
-      <div className='d-flex align-items-center summary-item'>
-        <p className='summary-label'>Total</p>
-        <p className='summary-value ml-auto'>${order.totalWithTax}</p>
-      </div>
-    </Col>
+    <div className='p-list'>
+      {products.map((product, index) => (
+        <Link
+          to={`/dashboard/product/edit/${product._id}`}
+          key={index}
+          className='d-flex flex-row align-items-center mx-0 mb-3 product-box'
+        >
+          <img
+            className='item-image'
+            src={`${
+              product && product.imageUrl
+                ? product.imageUrl
+                : '/images/placeholder-image.png'
+            }`}
+          />
+          <div className='d-flex flex-column justify-content-center px-3 text-truncate'>
+            <h4 className='text-truncate'>{product.name}</h4>
+            <p className='mb-2 text-truncate'>{product.description}</p>
+          </div>
+        </Link>
+      ))}
+    </div>
   );
 };
 
-export default OrderSummary;
+export default ProductList;
