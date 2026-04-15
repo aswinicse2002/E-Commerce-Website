@@ -1,72 +1,49 @@
 /**
  *
- * AddBrand
+ * MiniBrand
  *
  */
 
 import React from 'react';
 
-import { Row, Col } from 'reactstrap';
+import { Link } from 'react-router-dom';
 
-import Input from '../../Common/Input';
-import Switch from '../../Common/Switch';
-import Button from '../../Common/Button';
+const MiniBrand = props => {
+  const { brands, toggleBrand } = props;
 
-const AddBrand = props => {
-  const { brandFormData, formErrors, brandChange, addBrand } = props;
-
-  const handleSubmit = event => {
-    event.preventDefault();
-    addBrand();
+  const handleMenuItemClick = () => {
+    toggleBrand();
   };
 
   return (
-    <div className='add-brand'>
-      <form onSubmit={handleSubmit} noValidate>
-        <Row>
-          <Col xs='12'>
-            <Input
-              type={'text'}
-              error={formErrors['name']}
-              label={'Name'}
-              name={'name'}
-              placeholder={'Brand Name'}
-              value={brandFormData.name}
-              onInputChange={(name, value) => {
-                brandChange(name, value);
-              }}
-            />
-          </Col>
-          <Col xs='12' md='12'>
-            <Input
-              type={'textarea'}
-              error={formErrors['description']}
-              label={'Description'}
-              name={'description'}
-              placeholder={'Brand Description'}
-              value={brandFormData.description}
-              onInputChange={(name, value) => {
-                brandChange(name, value);
-              }}
-            />
-          </Col>
-          <Col xs='12' md='12' className='my-2'>
-            <Switch
-              id={'active-brand'}
-              name={'isActive'}
-              label={'Active?'}
-              checked={brandFormData.isActive}
-              toggleCheckboxChange={value => brandChange('isActive', value)}
-            />
-          </Col>
-        </Row>
-        <hr />
-        <div className='add-brand-actions'>
-          <Button type='submit' text='Add Brand' />
-        </div>
-      </form>
+    <div className='mini-brand-list'>
+      <div className='d-flex align-items-center justify-content-between min-brand-title'>
+        <h3 className='mb-0 text-uppercase'>Shop By Brand</h3>
+        <Link
+          to={'/brands'}
+          className='redirect-link'
+          role='menuitem'
+          onClick={handleMenuItemClick}
+        >
+          See all
+        </Link>
+      </div>
+      <div className='mini-brand-block'>
+        {brands.map((brand, index) => (
+          <div key={index} className='brand-item'>
+            <Link
+              to={`/shop/brand/${brand.slug}`}
+              className='brand-link'
+              role='menuitem'
+              onClick={handleMenuItemClick}
+            >
+              {brand.name}
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
-export default AddBrand;
+export default MiniBrand;
