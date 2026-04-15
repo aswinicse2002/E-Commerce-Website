@@ -1,36 +1,26 @@
 /**
  *
- * UserRole
+ * UserSearch
  *
  */
 
 import React from 'react';
 
-import { ROLES } from '../../../constants';
-import Badge from '../../Common/Badge';
+import SearchBar from '../../Common/SearchBar';
 
-const UserRole = props => {
-  const { className, user } = props;
-
+const UserSearch = props => {
   return (
-    <>
-      {user.role === ROLES.Admin ? (
-        <Badge variant='primary' className={className}>
-          Admin
-        </Badge>
-      ) : user.role === ROLES.Merchant ? (
-        <Badge variant='dark' className={className}>
-          Merchant
-        </Badge>
-      ) : (
-        <Badge className={className}>Member</Badge>
-      )}
-    </>
+    <div className='mb-3'>
+      <SearchBar
+        name='user'
+        placeholder='Type user name or email'
+        btnText='Search'
+        onSearch={props.onSearch}
+        onBlur={props.onBlur}
+        onSearchSubmit={props.onSearchSubmit}
+      />
+    </div>
   );
 };
 
-UserRole.defaultProps = {
-  className: ''
-};
-
-export default UserRole;
+export default UserSearch;
