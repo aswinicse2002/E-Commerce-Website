@@ -1,6 +1,6 @@
 /**
  *
- * EditCategory
+ * EditProduct
  *
  */
 
@@ -9,35 +9,43 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Row, Col } from 'reactstrap';
 
+import { ROLES } from '../../../constants';
 import Input from '../../Common/Input';
+import Switch from '../../Common/Switch';
 import Button from '../../Common/Button';
 import SelectOption from '../../Common/SelectOption';
-import Switch from '../../Common/Switch';
 
-const EditCategory = props => {
+const taxableSelect = [
+  { value: 1, label: 'Yes' },
+  { value: 0, label: 'No' }
+];
+
+const EditProduct = props => {
   const {
-    products,
-    category,
-    categoryChange,
+    user,
+    product,
+    productChange,
     formErrors,
-    updateCategory,
-    deleteCategory,
-    activateCategory
+    brands,
+    updateProduct,
+    deleteProduct,
+    activateProduct
   } = props;
 
   const handleSubmit = event => {
     event.preventDefault();
-    updateCategory();
+    updateProduct();
   };
 
   return (
-    <div className='edit-category'>
+    <div className='edit-product'>
       <div className='d-flex flex-row mx-0 mb-3'>
-        <label className='mr-1'>Category link </label>
-        <Link to={`/shop/category/${category.slug}`} className='default-link'>
-          {category.slug}
+        <label className='mr-1'>Product link </label>
+        <Link to={`/product/${product.slug}`} className='default-link'>
+          {product.slug}
         </Link>
       </div>
+
       <form onSubmit={handleSubmit} noValidate>
         <Row>
           <Col xs='12'>
@@ -46,10 +54,23 @@ const EditCategory = props => {
               error={formErrors['name']}
               label={'Name'}
               name={'name'}
-              placeholder={'Category Name'}
-              value={category.name}
+              placeholder={'Product Name'}
+              value={product.name}
               onInputChange={(name, value) => {
-                categoryChange(name, value);
+                productChange(name, value);
+              }}
+            />
+          </Col>
+          <Col xs='12'>
+            <Input
+              type={'text'}
+              error={formErrors['sku']}
+              label={'Sku'}
+              name={'sku'}
+              placeholder={'Product Sku'}
+              value={product.sku}
+              onInputChange={(name, value) => {
+                productChange(name, value);
               }}
             />
           </Col>
@@ -59,10 +80,10 @@ const EditCategory = props => {
               error={formErrors['slug']}
               label={'Slug'}
               name={'slug'}
-              placeholder={'Category Slug'}
-              value={category.slug}
+              placeholder={'Product Slug'}
+              value={product.slug}
               onInputChange={(name, value) => {
-                categoryChange(name, value);
+                productChange(name, value);
               }}
             />
           </Col>
@@ -72,37 +93,78 @@ const EditCategory = props => {
               error={formErrors['description']}
               label={'Description'}
               name={'description'}
-              placeholder={'Category Description'}
-              value={category.description}
+              placeholder={'Product Description'}
+              value={product.description}
               onInputChange={(name, value) => {
-                categoryChange(name, value);
+                productChange(name, value);
+              }}
+            />
+          </Col>
+          <Col xs='12' lg='6'>
+            <Input
+              type={'number'}
+              error={formErrors['quantity']}
+              label={'Quantity'}
+              name={'quantity'}
+              decimals={false}
+              placeholder={'Product Quantity'}
+              value={product.quantity}
+              onInputChange={(name, value) => {
+                productChange(name, value);
+              }}
+            />
+          </Col>
+          <Col xs='12' lg='6'>
+            <Input
+              type={'number'}
+              error={formErrors['price']}
+              label={'Price'}
+              name={'price'}
+              min={1}
+              placeholder={'Product Price'}
+              value={product.price}
+              onInputChange={(name, value) => {
+                productChange(name, value);
               }}
             />
           </Col>
           <Col xs='12' md='12'>
             <SelectOption
-              error={formErrors['products']}
-              label={'Select Products'}
-              multi={true}
-              defaultValue={category.products}
-              options={products}
+              error={formErrors['taxable']}
+              label={'Taxable'}
+              multi={false}
+              name={'taxable'}
+              value={[product.taxable ? taxableSelect[0] : taxableSelect[1]]}
+              options={taxableSelect}
               handleSelectChange={value => {
-                categoryChange('products', value);
+                productChange('taxable', value.value);
               }}
             />
           </Col>
+          {user.role === ROLES.Admin && (
+            <Col xs='12' md='12'>
+              <SelectOption
+                error={formErrors['brand']}
+                label={'Select Brand'}
+                multi={false}
+                value={product.brand}
+                options={brands}
+                handleSelectChange={value => {
+                  productChange('brand', value);
+                }}
+              />
+            </Col>
+          )}
           <Col xs='12' md='12' className='mt-3 mb-2'>
             <Switch
-              style={{ width: 100 }}
-              tooltip={category.isActive}
-              tooltipContent={`Disabling ${category.name} will also disable all ${category.name} products.`}
-              id={`enable-category-${category._id}`}
+              id={`enable-product-${product._id}`}
               name={'isActive'}
               label={'Active?'}
-              checked={category.isActive}
-              toggleCheckboxChange={value =>
-                activateCategory(category._id, value)
-              }
+              checked={product?.isActive}
+              toggleCheckboxChange={value => {
+                productChange('isActive', value);
+                activateProduct(product._id, value);
+              }}
             />
           </Col>
         </Row>
@@ -116,7 +178,7 @@ const EditCategory = props => {
           <Button
             variant='danger'
             text='Delete'
-            onClick={() => deleteCategory(category._id)}
+            onClick={() => deleteProduct(product._id)}
           />
         </div>
       </form>
@@ -124,4 +186,4 @@ const EditCategory = props => {
   );
 };
 
-export default EditCategory;
+export default EditProduct;
