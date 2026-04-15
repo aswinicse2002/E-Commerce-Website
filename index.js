@@ -1,79 +1,71 @@
 /**
  *
- * OrderList
+ * OrderMeta
  *
  */
 
 import React from 'react';
 
-import { Link } from 'react-router-dom';
+import { Row, Col } from 'reactstrap';
 
+import { CART_ITEM_STATUS } from '../../../constants';
 import { formatDate } from '../../../utils/date';
+import Button from '../../Common/Button';
+import { ArrowBackIcon } from '../../Common/Icon';
 
-const OrderList = props => {
-  const { orders } = props;
+const OrderMeta = props => {
+  const { order, cancelOrder, onBack } = props;
 
-  const renderFirstItem = order => {
-    if (order.products) {
-      const product = order.products[0].product;
-      return (
-        <img
-          className='item-image'
-          src={`${
-            product && product?.imageUrl
-              ? product?.imageUrl
-              : '/images/placeholder-image.png'
-          }`}
-        />
-      );
-    } else {
-      return <img className='item-image' src='/images/placeholder-image.png' />;
+  const renderMetaAction = () => {
+    const isNotDelivered =
+      order.products.filter(i => i.status === CART_ITEM_STATUS.Delivered)
+        .length < 1;
+
+    if (isNotDelivered) {
+      return <Button size='sm' text='Cancel Order' onClick={cancelOrder} />;
     }
   };
 
   return (
-    <div className='order-list'>
-      {orders.map((order, index) => (
-        <div key={index} className='order-box'>
-          <Link to={`/order/${order._id}`} className='d-block box-link'>
-            <div className='d-flex flex-column flex-lg-row mb-3'>
-              <div className='order-first-item p-lg-3'>
-                {renderFirstItem(order)}
-              </div>
-              <div className='d-flex flex-column flex-xl-row justify-content-between flex-1 ml-lg-2 mr-xl-4 p-3'>
-                <div className='order-details'>
-                  <div className='mb-1'>
-                    <span>Status</span>
-                    {order?.products ? (
-                      <span className='order-label order-status'>{` ${order?.products[0].status}`}</span>
-                    ) : (
-                      <span className='order-label order-status'>{` Unavailable`}</span>
-                    )}
-                  </div>
-                  <div className='mb-1'>
-                    <span>Order #</span>
-                    <span className='order-label'>{` ${order._id}`}</span>
-                  </div>
-                  <div className='mb-1'>
-                    <span>Ordered on</span>
-                    <span className='order-label'>{` ${formatDate(
-                      order.created
-                    )}`}</span>
-                  </div>
-                  <div className='mb-1'>
-                    <span>Order Total</span>
-                    <span className='order-label'>{` $${
-                      order?.totalWithTax ? order?.totalWithTax : 0
-                    }`}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Link>
-        </div>
-      ))}
+    <div className='order-meta'>
+      <div className='d-flex align-items-center justify-content-between mb-3 title'>
+        <h2 className='mb-0'>Order Details</h2>
+        <Button
+          variant='link'
+          icon={<ArrowBackIcon />}
+          size='sm'
+          text='Back to orders'
+          onClick={onBack}
+        ></Button>
+      </div>
+
+      <Row>
+        <Col xs='12' md='8'>
+          <Row>
+            <Col xs='4'>
+              <p className='one-line-ellipsis'>Order ID</p>
+            </Col>
+            <Col xs='8'>
+              <span className='order-label one-line-ellipsis'>{` ${order._id}`}</span>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs='4'>
+              <p className='one-line-ellipsis'>Order Date</p>
+            </Col>
+            <Col xs='8'>
+              <span className='order-label one-line-ellipsis'>{` ${formatDate(
+                order.created
+              )}`}</span>
+            </Col>
+          </Row>
+        </Col>
+        <Col xs='12' md='4' className='text-left text-md-right'>
+          {renderMetaAction()}
+        </Col>
+      </Row>
     </div>
   );
 };
 
-export default OrderList;
+export default OrderMeta;
